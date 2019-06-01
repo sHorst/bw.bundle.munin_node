@@ -1,0 +1,14 @@
+service munin
+{
+        type           = UNLISTED
+        port           = {{ port }}
+        socket_type    = stream
+        protocol       = tcp
+        wait           = no
+        user           = munin
+        server         = /usr/sbin/munin-node-c
+        #flags          = IPv6
+        only_from      = 127.0.0.1 {{ ips }}
+        log_on_success =
+        disable        = no
+}
