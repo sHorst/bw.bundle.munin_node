@@ -1,3 +1,5 @@
+from bundlewrap.exceptions import BundleError
+
 munin_config = node.metadata.get('munin', {})
 
 symlinks = {}
@@ -17,6 +19,10 @@ if munin_config.get('type', 'c') == 'c':
         'installed': False,
     }
 
+    # if we do not have xinetd, we will fail here
+    if not node.has_bundle('xinetd'):
+        raise BundleError('you need to have xinetd enabled for this node')
+
     files['/etc/xinetd.d/munin'] = {
         'content_type': 'jinja2',
         'owner': 'root',
@@ -31,7 +37,7 @@ if munin_config.get('type', 'c') == 'c':
             'pkg_apt:munin-node-c',
         ],
         'triggers': [
-            'svc_systemd:xinetd:restart',
+            'svc_systemd:xinetd.service:restart',
         ]
     }
 
