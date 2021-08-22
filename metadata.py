@@ -47,6 +47,9 @@ def add_iptables_rules(metadata):
 def add_munin_plugin_for_interfaces(metadata):
     plugins = {}
     for interface, config in metadata.get('interfaces', {}).items():
+        if ':' in interface:
+            continue
+
         plugins['if_{}'.format(interface)] = {
             'executable': 'if_',
             'apt': 'munin-plugins-core',
