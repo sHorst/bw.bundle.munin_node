@@ -7,6 +7,9 @@ defaults = {
 
 @metadata_reactor
 def add_iptables_rules(metadata):
+    if not node.has_bundle("iptables"):
+        raise DoNotRunAgain
+
     munin_server = repo.get_node(metadata.get('munin/server', ''))
 
     if munin_server.partial_metadata == {}:
@@ -25,15 +28,14 @@ def add_iptables_rules(metadata):
 
     iptables_rules = {}
 
-    if node.has_bundle("iptables"):
-        for interface in interfaces:
-            for ip in munin_server_ips:
-                iptables_rules += repo.libs.iptables.accept(). \
-                    input(interface). \
-                    state_new(). \
-                    tcp(). \
-                    source(ip). \
-                    dest_port(metadata.get('munin/port', 4949))
+    for interface in interfaces:
+        for ip in munin_server_ips:
+            iptables_rules += repo.libs.iptables.accept(). \
+                input(interface). \
+                state_new(). \
+                tcp(). \
+                source(ip). \
+                dest_port(metadata.get('munin/port', 4949))
 
     return {
         'iptables': iptables_rules['iptables'],
